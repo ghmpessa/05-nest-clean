@@ -2,7 +2,9 @@ import { StudentsRepository } from '@/domain/forum/application/repositories/stud
 import { Student } from '@/domain/forum/enterprise/entities/student'
 import { PrismaService } from '../prisma.service'
 import { PrismaStudentMapper } from '../mappers/prisma-student-mapper'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export class PrismaStudentsRepository implements StudentsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
