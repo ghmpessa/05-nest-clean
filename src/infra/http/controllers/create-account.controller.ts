@@ -7,9 +7,9 @@ import {
   UsePipes,
 } from '@nestjs/common'
 import { PrismaService } from '@/infra/database/prisma/prisma.service'
-import { hash } from 'bcryptjs'
 import { z } from 'zod'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation.pipe'
+import { HasherGenerator } from '@/domain/forum/cryptography/hasher-generator'
 
 const createAccountBodySchema = z.object({
   name: z.string(),
@@ -21,7 +21,10 @@ type CreateAccountBodySchema = z.infer<typeof createAccountBodySchema>
 
 @Controller('/accounts')
 export class CreateAccountController {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly hashGenerator: HasherGenerator,
+  ) {}
 
   @Post()
   @HttpCode(201)
@@ -39,7 +42,7 @@ export class CreateAccountController {
       )
     }
 
-    const hashedPassword = await hash(password, 8)
+    const hashedPassword = await this.hashGenerator.hash(password)
 
     await this.prismaService.user.create({
       data: {
